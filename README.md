@@ -1,4 +1,4 @@
-[Section 3 : Linear Methods for Regression](section 3/)
+[Section 3 : Linear Methods for Regression](section3/)
 
 
 
