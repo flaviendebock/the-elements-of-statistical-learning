@@ -1,0 +1,56 @@
+---
+title: "Linear Regression: Prostate Cancer"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+```{r}
+rm(list = ls())
+library(stargazer) ; library(stats) ; library(tidyverse) ; library(readr) ; library(corrplot) ; library(psych)
+# Linear Regression : Prostate Cancer
+# Data come from Stamey et al. (1989). 
+# Look a correlation between the level of prostate-specific antigen and
+# a number of clinical measures in men who were about to receive a radical prostatectomy. 
+# The variables are :
+# log cancer volume (lcavol) 
+# log prostate weight (lweight)
+# age
+# log of the amount of benign prostatic hyperplasia (lbph)
+# seminal vesicle invasion (svi)
+# log of capsular penetration (lcp),
+# Gleason score (gleason)
+# percent of Gleason scores 4 or 5 (pgg45).
+# We first load the data and examine it. 
+data <- read_delim("prostate.data.txt", delim = "\t") # import the data
+
+names(data)[1] <- "ID" # rename the ID column
+head(data) ; summary(data) # visualize
+vars <- c("lcavol", "lweight", "age", "lbph", "svi", "lcp", "gleason", "pgg45") # features
+data <- data %>% mutate_at(append(vars, "lpsa"), as.numeric) # convert the the variables to numeric.
+data <- data %>% mutate_at(vars, ~ scale(.) %>% as.vector) # standardize the features
+corr_matrix <- cor(data[,vars]) # correlation matrix
+corrplot(corr_matrix, method = "square", addCoef.col = 'black')  # associated plot
+# scatter plot matrices (SPLOM), 
+# with bivariate scatter plots below the diagonal, 
+# histograms on the diagonal, 
+#and the Pearson correlation above the diagonal. 
+pairs.panels(data[, vars], hist.col = "lightblue", density = F, smooth = F, 
+             ellipses = F) 
+# We fit a linear model to the log of prostate-specific antigen, lpsa, after
+# Randomly split the data into training set of size 67 and test set of size 30. 
+train_data <- subset(data, train == "TRUE")
+formula <- reformulate(vars, response = "lpsa")
+model <- lm(formula, data = train_data)
+summary(model)
+# we compute the associated MSPE on the test data
+test_data <- subset(data, train != "TRUE")
+predictions <- predict(model, newdata = test_data)
+MSPE_1 <- sum((predictions - test_data$lpsa)^2)/nrow(test_data) # approx 0.52
+# In contrast, if we use the mean lpsa in the training set, 
+# we would get a MSPE of
+MSPE_2 <- sum((mean(train_data$lpsa) - test_data$lpsa)^2) / nrow(test_data) # 1.06
+MSPE_1/MSPE_2 - 1 # linear model reduces "base error rate" by about 50\%
+```
