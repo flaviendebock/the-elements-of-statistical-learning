@@ -1,4 +1,4 @@
-[Section 3 : Linear Methods for Regression](section%203/) : Ridge, LASSO
+[Section 3 : Linear Methods for Regression](section%203/) : Best-subset selection, Forward-stepwise selection, Ridge, LASSO
 
 [Section 4 : Linear Methods for Classification](section%204/) : Logistic regression models
 
