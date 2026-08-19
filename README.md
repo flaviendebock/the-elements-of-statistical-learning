@@ -8,3 +8,4 @@ Note that most of the files in PDF format are Claude converting my handwritten n
 In particular, it often fails at writing in bold vectors and matrices. To avoid confusion, unless specified otherwise, I use column vectors. 
 
 
+https://hastie.su.domains/ElemStatLearn/
