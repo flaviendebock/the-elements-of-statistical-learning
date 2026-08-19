@@ -129,3 +129,64 @@ ggplot(cv_data, aes(x = df, y = cvm)) +
 
 ```
 
+```{r}
+# LASSO ----------
+lasso <- cv.glmnet(X, y, nfolds = 10, trace.it = 1, alpha = 1,
+                   lambda = 10^seq(10, -2, length.out = 100)) # LASSO with CV10
+coef(lasso, s = "lambda.1se") # look at the model associated to lambda minimizing CV10
+# using the least complex model within 1 standard error of the best model
+y_hat_lasso <- predict(lasso, newx = X_test, s = "lambda.1se") # fitted values on test data
+MSPE_lasso <- sum((y_hat_lasso - y_test)^2) / nrow(test_data) ; MSPE_lasso # MSPE
+std_lasso  <- as.numeric(sqrt(var((y_hat_lasso - y_test)^2) / nrow(test_data))) ; std_lasso # sd
+MSPE_lasso / MSPE_1 - 1 # lasso reduces test error of LS estimates by a bigger amount. (around 7.5%)
+MSPE_lasso / MSPE_ridge - 1 # lasso reduces test error of Ridge estimates by a small amount (around 3%)
+
+ols_fit  <- lm(y ~ X) ; summary(ols_fit)
+beta_ols <- coef(ols_fit)[-1]        # drop intercept
+denom    <- sum(abs(beta_ols))       # max(t)
+
+coefs_lasso <- as.matrix(t(coef(lasso$glmnet.fit)))[, -1]  # drop intercept column
+t_lambda    <- rowSums(abs(coefs_lasso))                   # t at each lambda
+s           <- t_lambda / denom                            # shrinkage factor
+df_plot <- as.data.frame(coefs_lasso)
+df_plot$s <- s
+df_plot_long <- df_plot %>%
+  pivot_longer(cols = -s, names_to = "variable", values_to = "coefficient")
+
+ggplot(df_plot_long, aes(x = s, y = coefficient, color = variable)) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 0.6) +
+  geom_hline(yintercept = 0, linetype = "dotted", color = "grey40") +
+  labs(x = expression(s == t / t[max]), y = "Coefficients",
+       title = "LASSO Coefficient Profiles vs. Shrinkage Factor",
+       color = "Variable") +
+  theme_minimal()
+
+s_cv <- rowSums(abs(coefs_lasso)) / denom  # same s as before, one value per lambda in the path
+
+cv_data_lasso <- data.frame(
+  lambda = lasso$lambda,
+  s      = s_cv,
+  cvm    = lasso$cvm, # mean Cv
+  cvlo   = lasso$cvlo, # mean Cv - se
+  cvup   = lasso$cvup # mean cv + se
+)
+
+s_min <- sum(abs(coef(lasso, s = "lambda.min")[-1])) / denom
+s_1se <- sum(abs(coef(lasso, s = "lambda.1se")[-1])) / denom
+
+ggplot(cv_data_lasso, aes(x = s, y = cvm)) +
+  geom_errorbar(aes(ymin = cvlo, ymax = cvup), color = "grey70", width = 0.01) +
+  geom_line(color = "steelblue", linewidth = 0.6) +
+  geom_point(color = "steelblue", size = 1.5) +
+  geom_vline(xintercept = s_min, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = s_1se, linetype = "dashed", color = "black") +
+  annotate("text", x = s_min, y = max(cv_data_lasso$cvup),
+           label = paste0("s.min = ", round(s_min, 2)), hjust = -0.1, size = 3.5) +
+  annotate("text", x = s_1se, y = max(cv_data_lasso$cvup) * 0.95,
+           label = paste0("s.1se = ", round(s_1se, 2)), hjust = -0.1, size = 3.5) +
+  labs(x = expression(s == t / t[max]), y = "Cross-Validation Error (MSE)",
+       title = "LASSO CV Error vs. Shrinkage Factor") +
+  theme_minimal()
+
+```
