@@ -2,7 +2,7 @@
 - Best-subset selection
 - Forward-stepwise selection
 - Ridge
-- LASSO (based on R.Tibshirani - 1996 Journal of the Royal Statistical Society
+- LASSO (based on R.Tibshirani - 1996 Journal of the Royal Statistical Society)
 - Inference after model selection (based on A.Belloni , V.Chernozhukov , C.Hansen - 2014 REStud)
 
 [Section 4 : Linear Methods for Classification](section%204/) : Logistic regression models
