@@ -3,7 +3,9 @@
 - Forward-stepwise selection
 - Ridge
 - LASSO (based on R.Tibshirani - 1996 Journal of the Royal Statistical Society)
+- Theory for the LASSO (based on Statistics for High-Dimensional Data Methods - P.Bühlmann , S.van de Geer 2011)
 - Inference after model selection (based on A.Belloni , V.Chernozhukov , C.Hansen - 2014 REStud)
+  
 
 [Section 4 : Linear Methods for Classification](section%204/) : Logistic regression models
 
