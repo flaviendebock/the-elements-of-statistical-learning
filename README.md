@@ -8,7 +8,9 @@
 - Elastic Net (based on H.Zou, T.Hastie - 2005 Journal of the Royal Statistical Society Series B)
   
 
-[Section 4 : Linear Methods for Classification](section%204/) : Logistic regression models
+[Section 4 : Linear Methods for Classification](section%204/) : 
+- Linear regression of an indicator matrix
+- Logistic regression models
 
 [Section 7 : Model Assessment and Selection](section%207/) : 
 - Optimism of the training error rate
