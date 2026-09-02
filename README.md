@@ -10,6 +10,7 @@
 
 [Section 4 : Linear Methods for Classification](section%204/) : 
 - Linear regression of an indicator matrix
+- Linear & Quadratic Discriminant Analysis
 - Logistic regression models
 
 [Section 7 : Model Assessment and Selection](section%207/) : 
