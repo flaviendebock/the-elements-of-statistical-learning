@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 
 ```{r}
 rm(list = ls())
-library(readr) ; library(tidyverse) ; library(corrplot)
+library(readr) ; library(tidyverse) ; library(corrplot) ; library(MASS)
 
 train <- read.csv("vowel_train.csv", sep = ",")
 train$x.10. <- gsub("\\\\", "", train$x.10.)
@@ -30,6 +30,8 @@ train[paste0("y_", 1:11)] <- lapply(1:11, function(k) { as.integer(train$y == k)
 test[paste0("y_", 1:11)] <- lapply(1:11, function(k) { as.integer(test$y == k)})
 
 x_vars <- paste0("x.", 1:10) # string vector of the name of the features
+
+# Regression Indicator Matrix ------
 
 models <- vector("list", 11) # create an empty list to store the 11 regressions
 
@@ -66,6 +68,33 @@ prediction_test <- max.col(fitted_test, ties.method = "first")
 
 # the test error rate is ~0.67
 test_error_rate <- mean(test$y != prediction_test) ; test_error_rate
+
+# LDA ------ 
+
+lda_model <- lda(y ~ x.1 + x.2 + x.3 + x.4 + x.5 + x.6 + x.7 + x.8 + x.9 + x.10,
+                 data = train) ; lda_model
+
+lda_prediction_train <- predict(lda_model, newdata = train)
+lda_prediction_test <- predict(lda_model, newdata = test)
+
+# training error rate is ~ 0.32
+lda_train_error_rate <- mean(train$y != lda_prediction_train$class) ; lda_train_error_rate
+# test error rate is ~ 0.56
+lda_test_error_rate <- mean(test$y != lda_prediction_test$class) ; lda_test_error_rate
+
+# QDA ---------
+
+qda_model <- qda(y ~ x.1 + x.2 + x.3 + x.4 + x.5 + x.6 + x.7 + x.8 + x.9 + x.10,
+                 data = train) ; qda_model
+
+qda_prediction_train <- predict(qda_model, newdata = train)
+qda_prediction_test <- predict(qda_model, newdata = test)
+
+# training error rate is ~ 0.01
+qda_train_error_rate <- mean(train$y != qda_prediction_train$class) ; qda_train_error_rate
+# test error rate is ~ 0.53
+qda_test_error_rate <- mean(test$y != qda_prediction_test$class) ; qda_test_error_rate
+
 ```
 
 
